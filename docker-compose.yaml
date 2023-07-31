@@ -1,0 +1,23 @@
+services:
+  api:
+    platform: linux/amd64
+    container_name: fastapiapp
+    command: "uvicorn fast_api_test:app --host 0.0.0.0 --port 80"
+    build: api_stuff/
+    ports:
+      - "80:80"
+    networks: #user defined network bridge for all containers
+      - jcnet
+
+  app:
+    platform: linux/amd64
+    container_name: streamlitapp
+    command: "streamlit run streamlit_app.py --server.port=8501 --server.address=0.0.0.0"
+    build: app_stuff/
+    ports:
+      - "8501:8501"
+    networks:
+      - jcnet
+networks:
+  jcnet:
+     external: true
