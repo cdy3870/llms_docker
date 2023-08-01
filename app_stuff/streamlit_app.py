@@ -30,7 +30,7 @@ doi = st.text_input("Enter a research topic (ex. machine learning and drones) fo
 inputs = {"text": doi}
 
 if st.button("Get recommended papers"):
-	res = requests.post(url="http://0.0.0.0:8000/get_recs", json=inputs)
+	res = requests.post(url="http://api:8000/get_recs", json=inputs)
 	st.markdown(res.text)	
 
 doi = st.text_input("Enter an arxiv DOI or paper name")
@@ -40,7 +40,7 @@ if st.button("Get info"):
 	# res = requests.post(url="http://0.0.0.0:8000/get_summary", json=inputs)
 	# st.markdown(f"Summary: {res.text}")
 
-	res = requests.post(url="http://0.0.0.0:8000/get_con", json=inputs)
+	res = requests.post(url="http://api:8000/get_con", json=inputs)
 
 	bullet_points = res.text.split("\\n-")
 	print(bullet_points)
@@ -49,5 +49,5 @@ if st.button("Get info"):
 	for i, bullet in enumerate(bullet_points[1:]):
 		st.markdown(f"{i + 1}:{bullet}")
 
-	res = requests.post(url="http://0.0.0.0:8000/get_details", json=inputs)
+	res = requests.post(url="http://api:8000/get_details", json=inputs)
 	st.markdown(res.text)
