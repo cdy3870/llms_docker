@@ -13,5 +13,4 @@ uvicorn
 streamlit
 protobuf==3.20.*
 langchain
-langchainplus-sdk
 llama-index
