@@ -26,35 +26,12 @@ app = FastAPI()
 # Define the default route 
 @app.get("/")
 def root():
-	return {"message": "Welcome to Your Sentiment Classification FastAPI"}
+	return {"message": "arXiv backend"}
 
 
 class Item(BaseModel):
     text_input: str
     candidate_labels: str
-
-# Define the route to the sentiment predictor
-@app.post("/predict_sentiment")
-def predict_sentiment(item: Item):
-	labels = item.candidate_labels.split(" ")
-	prediction = classifier(item.text_input, labels)
-
-
-	# polarity = ""
-
-	# if(not(text_message)):
-	#     raise HTTPException(status_code=400, 
-	#                         detail = "Please Provide a valid text message")
-
-	# prediction = spam_clf.predict(vectorizer.transform([text_message]))
-
-	# if(prediction[0] == 0):
-	#     polarity = "Ham"
-
-	# elif(prediction[0] == 1):
-	#     polarity = "Spam"
-
-	return prediction
 
 
 class DOI(BaseModel):
@@ -86,7 +63,7 @@ def get_details(doi: DOI):
 
 @app.post("/get_recs")
 def get_recs(topic: DOI):
-	response = agent_chain.run(f"Can you find a list of papers related to {topic}")
+	response = agent_chain.run(f"Can you find a list of papers about {topic}")
 
 	print(response)
 
