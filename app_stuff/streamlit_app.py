@@ -56,6 +56,7 @@ def make_df(papers, confs):
 	# conf = ["test", "test", "test"]
 	sample_h5 = [53, 34, 23]
 	sample_impact = [5, 8, 6]
+	
 	chart = pd.DataFrame({"Conference": confs, "Related Paper": papers, "H5-index": sample_h5, "Impact Score": sample_impact})
 	# chart["Publish Date"] = pd.to_datetime(chart["Publish Date"])
 	chart_1 = chart.sort_values("H5-index", ascending=False)
@@ -75,9 +76,10 @@ inputs = {"text": doi}
 if st.button("Get similar papers"):
 	# res = requests.post(url="http://0.0.0.0:8000/get_recs", json=inputs)
 	# recs = res.text
-
-	recs = "There are three papers about 'drone type classification using time series data' which have been accepted into a conference: \n1. Sound-based drone fault classification using multitask learning\n2. Constraint-Aware Trajectory for Drone Delivery Services\n3. Fast and Accurate Time Series Classification with WEASEL"
-	papers = parse_recs(recs)
+	# papers = parse_recs(recs)
+	papers = ['Human-Drone Interactions with Semi-Autonomous Cohorts of Collaborating Drones',
+ 'Sound-based drone fault classification using multitask learning',
+ 'Post-disaster 4G/5G Network Rehabilitation using Drones: Solving Battery and Backhaul Issues']
 	URLs = [generate_url(paper) for paper in papers]
 	ids = [extract_id(url) for url in URLs]
 	confs = [extract_conference(id) for id in ids]
