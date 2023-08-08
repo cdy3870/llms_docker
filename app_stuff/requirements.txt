@@ -16,3 +16,5 @@ altair<5
 langchain==0.0.227
 langchainplus-sdk==0.0.20
 llama-index
+beautifulsoup4
+plotly

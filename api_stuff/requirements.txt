@@ -14,3 +14,4 @@ streamlit
 protobuf==3.20.*
 langchain
 llama-index
+openai
