@@ -29,11 +29,11 @@ Otherwise, you can access the service here: (under maintainence)
 ## How it works and services involved
 1. LangChain is a library used to leverage the capabilities of large language models (llms), when OpenAI's llm is paired with a tool, it is capable of reasoning beyond the environment it was 
 trained in
-- When paired with the arXiv API, an agent can be created to query and reason with research paper database
+- When paired with the arXiv API, an agent can be created to query and reason with a research paper database
 - We make a request for papers related to a specific research topic
 2. Once we parse the recommended papers, we can extract the arXiv ids by using a web scraping tool called BeautifulSoup
 3. After obtaining arXiv ids, we can find the corresponding conference within the page as well
-4. The issue with that the conference within the arXiv page is not processed so we may have a string like "Accepted by the ACM Transactions on Intelligent Systems and Technology (TIST)" but we only need Transactions on Intelligent Systems and Technology if we want to search the SJR conference website
+4. The issue with that the conference within the arXiv page is not processed so we may have a string like "Accepted by the ACM Transactions on Intelligent Systems and Technology (TIST)" but we only need "Transactions on Intelligent Systems and Technology" if we want to search correctly on the SJR conference website
 - Therefore we use the DaVinci text completion engine to help parse out this conference
 5. Then we can make the GET request on the SJR website
 - The results may be multiple editions of the conference/journal, so we parse out all of them and get the most recent one
