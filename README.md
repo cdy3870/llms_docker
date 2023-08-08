@@ -4,7 +4,7 @@ This repo contains the code that for the research conference recommender. The pu
 
 ## Requirements
 
-The "frontend" is done using Streamlit and the backend/REST API is FastAPI. The setup has been simplified using Docker with multiple containers. The containers with be running on an AWS EC2 
+The "frontend" is done using Streamlit and the backend/REST API is FastAPI. The setup has been simplified using Docker with multiple containers. The containers will be running on an AWS EC2 
 instance. Follow the below instructions in the case that the servers are no longer running on AWS.
 
 ```
