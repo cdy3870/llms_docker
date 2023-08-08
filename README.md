@@ -23,7 +23,8 @@ Otherwise, you can access the service here: (under maintainence)
 2. APIs
 - OpenAI
 - arXiv
-- Serper
+3. Resources
+- https://www.scimagojr.com/ for conference metrics
 
 ## How it works and services involved
 1. LangChain is a library used to leverage the capabilities of large language models (llms), when OpenAI's llm is paired with a tool, it is capable of reasoning beyond the environment it was 
@@ -32,9 +33,12 @@ trained in
 - We make a request for papers related to a specific research topic
 2. Once we parse the recommended papers, we can extract the arXiv ids by using a web scraping tool called BeautifulSoup
 3. After obtaining arXiv ids, we can find the corresponding conference within the page as well
-4. The last step is to use the Serper API to create another agent that can figure out the H5-index and impact score of the conference
-- More about those metrics (https://libguides.wakehealth.edu/researchmetrics/journal#:~:text=H5%2Dindex%20%22It%20is%20the,60%20or%20more%20citations%20each)
-5. We make our final suggestions based on these metrics
+4. The issue with that the conference within the arXiv page is not processed so we may have a string like "Accepted by the ACM Transactions on Intelligent Systems and Technology (TIST)" but we only need Transactions on Intelligent Systems and Technology if we want to search the SJR conference website
+- Therefore we use the DaVinci text completion engine to help parse out this conference
+5. Then we can make the GET request on the SJR website
+- The results may be multiple editions of the conference/journal, so we parse out all of them and get the most recent one
+- The h5-index is then extracted 
+6. We make our final suggestions based on these metrics
 
 
 
