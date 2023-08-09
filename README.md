@@ -1,6 +1,6 @@
 # Research Conference Recommender
 
-This repo contains the code that for the research conference recommender. The purpose is to remove the hassle of figuring out which research conference you should submit your work to. 
+This repo contains the code that for a research conference recommender. The purpose is to remove the hassle of figuring out which research conference you should submit your work to. 
 
 ## Requirements
 
