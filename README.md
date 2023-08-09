@@ -12,7 +12,7 @@ cd llms_docker
 docker-compose up
 ```
 
-Otherwise, you can access the service here: (under maintainence)
+Otherwise, you can access the service here: http://3.84.235.58:8501/
 
 ## Libraries, Frameworks, APIs, Cloud Services
 1. Libraries and Frameworks
