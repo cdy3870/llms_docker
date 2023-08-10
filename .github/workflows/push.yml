@@ -8,4 +8,6 @@ jobs:
       - name: Setup network
         run: docker network create jcnet
       - name: Build the stack
-        run: docker-compose up -d
+        run: docker-compose build
+      - name: Run the stack
+        run: docker-compose up       
