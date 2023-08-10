@@ -1,11 +1,9 @@
+import string
 import streamlit as st
 import requests
-import json
-import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
-import string
 import plotly.express as px
 
 st.set_page_config(

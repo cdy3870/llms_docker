@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from joblib import load
 from pydantic import BaseModel
-# from transformers import pipeline
 import json
 import os
 from langchain.llms import OpenAI
@@ -10,12 +9,12 @@ import openai
 
 llm = OpenAI()
 arxiv_tools = load_tools(["arxiv"])
-arxiv_agent = initialize_agent(arxiv_tools, llm, 
+arxiv_agent = initialize_agent(arxiv_tools, llm,
 								agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION)
 
 api_key = os.getenv("OPENAI_API_KEY")
-openai.api_key = api_key
-
+openai.api_key = 
+api_key
 # Initialize an instance of FastAPI
 app = FastAPI()
 
@@ -24,8 +23,7 @@ app = FastAPI()
 @app.get("/")
 def root():
 	return {"message": "arXiv backend"}
-
-
+	
 class Item(BaseModel):
     text: str
 
