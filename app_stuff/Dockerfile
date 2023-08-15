@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt ./requirements.txt
+COPY journals_df_processed.pkl ./journals_df_processed.pkl
 
 RUN pip3 install --no-cache-dir -r requirements.txt
 
