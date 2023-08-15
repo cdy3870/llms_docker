@@ -5,6 +5,9 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import requests
 import plotly.express as px
+import json
+import seaborn as sns
+import pickle
 
 st.set_page_config(
 	page_title="Conference Recommender", layout="wide")
@@ -20,6 +23,9 @@ st.markdown(
 	unsafe_allow_html=True,
 )
 
+st.markdown("<h1 style='text-align: center'> Conference Recommendation for Your Research </h1>", unsafe_allow_html=True)
+
+
 def generate_url(paper):
 	URL = "https://arxiv.org/search/?query="
 	for string in paper.split(" "):
@@ -30,7 +36,7 @@ def generate_url(paper):
 
 def generate_conf_url(conf):
 	URL = "https://www.scimagojr.com/journalsearch.php?q="
-	print(conf.split(" "))
+	# print(conf.split(" "))
 	for string in conf.split(" "):
 		URL = URL + string + "+"
 	URL = URL[:-1]
@@ -146,51 +152,135 @@ def make_df(papers, confs, h5_indices):
 
 	return chart_1, bar_chart
 
+def match_categories(categories, top_labels):
+	categories_set = set(categories)
+	first_label = top_labels[0]
+	second_label = top_labels[1]
+	third_label = top_labels[2]
+
+	top_set = set(top_labels)
+	if first_label in categories_set:
+		return 1
+	elif second_label in categories_set:
+		return 2
+	elif third_label in categories_set:
+		return 3
+
+	return 0
+
+def get_confidence_charts(cats, name="main category (top 5)"):
+	labels = cats["labels"][:5]
+	probs = cats["probability"][:5]
+	if labels[0] == "Multidisciplinary":
+		labels = cats["labels"][1:6]
+		probs = cats["probability"][1:6]
+	df = (
+	pd.DataFrame({name: labels, "probability": probs})
+	.sort_values(by="probability", ascending=False)
+	.reset_index(drop=True)
+	)
+
+	df.index += 1
+
+	# Add styling
+	cmGreen = sns.light_palette("blue", as_cmap=True)
+	cmRed = sns.light_palette("red", as_cmap=True)
+	df = df.style.background_gradient(
+		cmap=cmGreen,
+		subset=[
+			"probability",
+		],
+	)
 
 
-st.markdown("<h1 style='text-align: center'> Conference Recommendation for Your Research </h1>", unsafe_allow_html=True)
+	format_dictionary = {
+		"Score": "{:.1%}",
+	}
+
+	df = df.format(format_dictionary)
+
+	return df
+
+
+@st.cache_data
+def get_journals_df():
+	journals = pd.read_pickle("journals_df_processed.pkl")
+	return journals
 
 
 
-doi = st.text_input("Enter a description about your paper")
-inputs = {"text": doi}
-
-if st.button("Get similar papers"):
-	# res = requests.post(url="http://0.0.0.0:8000/get_recs", json=inputs)
-	# recs = res.text
-	# papers = parse_recs(recs)
-	papers = ['Human-Drone Interactions with Semi-Autonomous Cohorts of Collaborating Drones',
- 'Sound-based drone fault classification using multitask learning',
- 'Post-disaster 4G/5G Network Rehabilitation using Drones: Solving Battery and Backhaul Issues']
-	URLs = [generate_url(paper) for paper in papers]
-	ids = [extract_id(url) for url in URLs]
-	confs = [extract_conference(id) for id in ids]
-
-	parsed_confs = []
-
-	for conf in [confs[0]]:
-		prompt = generate_prompt(conf)
-		inputs = {"text": prompt}
-		# res = requests.post(url="http://0.0.0.0:8000/get_main_confs", json=inputs)
-		# print(res.text)
-		# parsed_confs.append(res.text)
-	
-	parsed_confs = [s.strip() for s in ["International Congress on Sound and Vibration",
-					"International Conference on Service Oriented Computing",
-					"Conference on Human Factors in Computing Systems"]]
+def main():
+	doi = st.text_input("Enter a description about your paper")
+	inputs = {"text": doi}
 
 
-	h5_indices = []
-	for parsed_conf in parsed_confs:
-		conf_url = generate_conf_url(parsed_conf)
-		h5_index = get_h5_index(conf_url)
-		h5_indices.append(int(h5_index))
+	if st.button("Get recommendations"):
+		st.markdown("Recommended Conference Based on Categories and Subcategories")
 
-	chart_1, bar_chart = make_df(papers, parsed_confs, h5_indices)
-	st.markdown("Recommended Conference Based on Related Papers and H5-index")
-	st.dataframe(chart_1[["Conference", "Related Paper"]])
-	st.plotly_chart(bar_chart)
+		res = requests.post(url="http://0.0.0.0:8000/get_main_cat_preds", json=inputs)
+		main_cat_preds = json.loads(json.loads(res.text))
+		# print(type(main_cat_preds))
+		top_results, top_scores = zip(*main_cat_preds.items())
+		organized_results = {"labels": top_results, "probability": top_scores}
+		heatmap = get_confidence_charts(organized_results)
+		col_1, col_2 = st.columns(2)
+		col_1.table(heatmap)
 
 
+		inputs_2 = {'query': [inputs["text"]] + list(top_results[:3])}
+		res_2 = requests.get("http://0.0.0.0:8000/get_cat_preds/", params=inputs_2)
+		cat_preds = json.loads(json.loads(res_2.text))
+		top_results_cat, top_scores_cat = zip(*cat_preds.items())
+		organized_results = {"labels": top_results_cat, "probability": top_scores_cat}
+		heatmap = get_confidence_charts(organized_results, name="subcategory (top 5)")
+		col_2.table(heatmap)
+
+		# print(top_results_cat)
+		journals_df = get_journals_df()
+		journals_df["category ranking"] = journals_df["categories"].apply(lambda x : match_categories(x, top_results_cat[:3]))
+		journals_df = journals_df[(journals_df["category ranking"] > 0)].sort_values(["category ranking", "rank"])
+		hidden_categories = ["category ranking", "Unnamed: 0", "sourceid", "categories (str)"]
+		# option = st.selectbox(
+		#     'Sort Values',
+		#     ('h_index', 'sjr'))
+		st.dataframe(journals_df.drop(hidden_categories, axis=1))
+
+		# res = requests.post(url="http://0.0.0.0:8000/get_recs", json=inputs)
+		# recs = res.text
+		# papers = parse_recs(recs)
+		papers = ['Human-Drone Interactions with Semi-Autonomous Cohorts of Collaborating Drones',
+	 'Sound-based drone fault classification using multitask learning',
+	 'Post-disaster 4G/5G Network Rehabilitation using Drones: Solving Battery and Backhaul Issues']
+		URLs = [generate_url(paper) for paper in papers]
+		ids = [extract_id(url) for url in URLs]
+		confs = [extract_conference(id) for id in ids]
+
+		parsed_confs = []
+
+		for conf in [confs[0]]:
+			prompt = generate_prompt(conf)
+			inputs = {"text": prompt}
+			# res = requests.post(url="http://0.0.0.0:8000/get_main_confs", json=inputs)
+			# print(res.text)
+			# parsed_confs.append(res.text)
+		
+		parsed_confs = [s.strip() for s in ["International Congress on Sound and Vibration",
+						"International Conference on Service Oriented Computing",
+						"Conference on Human Factors in Computing Systems"]]
+
+
+		h5_indices = []
+		for parsed_conf in parsed_confs:
+			conf_url = generate_conf_url(parsed_conf)
+			h5_index = get_h5_index(conf_url)
+			h5_indices.append(int(h5_index))
+
+		chart_1, bar_chart = make_df(papers, parsed_confs, h5_indices)
+		st.markdown("Recommended Conference Based on Related Papers and H5-index")
+		st.dataframe(chart_1[["Conference", "Related Paper"]])
+		st.plotly_chart(bar_chart)
+
+if __name__ == "__main__":
+	main()
 
 #drone type classification using time series data
