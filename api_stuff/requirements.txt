@@ -16,3 +16,4 @@ langchain
 llama-index
 openai
 arxiv
+transformers
