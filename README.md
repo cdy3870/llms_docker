@@ -20,6 +20,7 @@ Otherwise, you can access the service here: http://3.84.235.58:8501/
 - Streamlit
 - Docker
 - BeautifulSoup
+- HuggingFace
 2. APIs
 - OpenAI
 - arXiv
@@ -27,6 +28,17 @@ Otherwise, you can access the service here: http://3.84.235.58:8501/
 - https://www.scimagojr.com/ for conference metrics
 
 ## How it works and services involved
+### Part 1: Recommendation Based on Categories and Subcategories
+1. The first part of the recommendation involves using the full list of journals provided by scimagojr
+- The R file containing this information (https://github.com/ikashnitsky/sjrdata) is converted into a csv
+- The main categories are scraped from the base website
+- The entries are preprocessed and cleaned
+2. We then use HuggingFace's zero-shot learning NLP model to determine which main category the topic falls under
+- Doing this reduces the number of subcategories to search through  when trying to narrow down the subcategory of the topic
+3. We apply the same zero-shot technique on the subcategory and obtain the most relevant subcategories to a topic
+4. The final step involves filtering the journals based on the predicted subcategories
+
+### Part 2: Recommendations Based on Papers
 1. LangChain is a library used to leverage the capabilities of large language models (llms), when OpenAI's llm is paired with a tool, it is capable of reasoning beyond the environment it was 
 trained in
 - When paired with the arXiv API, an agent can be created to query and reason with a research paper database
@@ -39,6 +51,4 @@ trained in
 - The results may be multiple editions of the conference/journal, so we parse out all of them and get the most recent one
 - The h5-index is then extracted 
 6. We make our final suggestions based on these metrics
-
-
 
