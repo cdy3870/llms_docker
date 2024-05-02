@@ -53,4 +53,4 @@ trained in
 6. We make our final suggestions based on these metrics
 
 ### Demo ###
-![GIF description](https://bpb-us-w2.wpmucdn.com/sites.northeastern.edu/dist/e/1156/files/2023/08/Recording-2023-08-15-at-18.34.23.gif)
+![](https://github.com/cdy3870/llms_docker/blob/main/demo.gif)
